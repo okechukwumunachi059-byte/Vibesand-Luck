@@ -2,236 +2,612 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Prevents unwanted zooming on mobile devices for a native app feel -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vibe & Luck</title> 
-    
-    <!-- Core Telegram WebApp API -->
+    <title>Vibe & Luck</title>
+    <!-- Telegram API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <style>
-        /* --- 1. GLOBAL VARIABLES & THEME --- */
         :root {
-            --bg-top: #0a0b1a;
-            --bg-bottom: #161122;
-            --card-bg: rgba(25, 30, 70, 0.4);
+            --bg-main: #060814;
+            --card-bg: rgba(20, 25, 60, 0.5);
             --card-border: rgba(100, 150, 255, 0.15);
-            --card-glow: rgba(100, 150, 255, 0.3);
             --text-main: #ffffff;
-            --text-accent: #F9D976;
+            --text-gold: #F9D976;
             --text-muted: #8C9BB4;
         }
-
         body {
-            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-            min-height: 100vh;
-            /* Prevents text selection for a native app feel */
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, var(--bg-main) 0%, #121026 100%);
+            color: var(--text-main); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 20px; text-align: center; min-height: 100vh;
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
-
-        /* --- 2. HEADER TYPOGRAPHY --- */
-        .header-container {
-            margin-bottom: 30px;
-            margin-top: 10px;
-        }
-        
-        .header-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        h1 {
-            font-family: 'Georgia', serif; /* Matches the elegant look in the reference */
-            color: var(--text-accent);
-            font-size: 32px;
-            margin: 5px 0;
-            font-weight: normal;
-            letter-spacing: 1px;
-            text-shadow: 0 0 20px rgba(249, 217, 118, 0.4);
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 11px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        /* --- 3. THE 2-COLUMN GRID --- */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        /* --- 4. PREMIUM CARD DESIGN --- */
+        /* Header */
+        .header { margin: 20px 0 35px; }
+        .header h1 { font-family: 'Georgia', serif; color: var(--text-gold); font-size: 32px; margin: 0; font-weight: 400; text-shadow: 0 0 15px rgba(249, 217, 118, 0.3); }
+        .header .subtitle { color: var(--text-muted); font-size: 11px; letter-spacing: 4px; text-transform: uppercase; margin-top: 8px; }
+        /* Grid & Cards */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 400px; margin: 0 auto; }
         .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 20px; /* High radius for soft corners */
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255, 255, 255, 0.02);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
+            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px;
+            padding: 25px 10px; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4); cursor: pointer; transition: all 0.2s ease;
         }
-
-        .card:active {
-            transform: scale(0.96);
-            box-shadow: 0 0 25px var(--card-glow);
-            border-color: rgba(100, 150, 255, 0.4);
+        .card:active { transform: scale(0.95); border-color: var(--text-gold); box-shadow: 0 0 20px rgba(249, 217, 118, 0.2); }
+        .card-icon { font-size: 42px; margin-bottom: 12px; filter: drop-shadow(0 0 12px rgba(255,255,255,0.2)); }
+        .card-title { font-size: 14px; font-weight: 500; letter-spacing: 0.5px; }
+        /* Action Buttons */
+        .action-btn {
+            background: linear-gradient(180deg, rgba(30,35,80,0.8), rgba(15,18,40,0.9));
+            border: 1px solid var(--card-border); color: var(--text-main); padding: 15px;
+            margin: 12px auto; width: 90%; max-width: 320px; border-radius: 12px;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s;
         }
-
-        /* Image/Icon container inside the cards */
-        .card-visual {
-            width: 70px; 
-            height: 70px; 
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(100,150,255,0.2) 0%, rgba(0,0,0,0) 70%);
-            margin-bottom: 15px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            font-size: 38px; 
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
-        }
-
-        .card-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-main);
-            letter-spacing: 0.5px;
-        }
-
-        /* Screens hidden by default for the router */
-        .screen { display: none; }
+        .action-btn:active { transform: scale(0.96); border-color: var(--text-gold); }
+        /* Screen Router */
+        .screen { display: none; margin-top: 20px; }
         .active-screen { display: block; animation: fadeIn 0.3s ease; }
-      @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-  <body>
+    <body>
     <!-- MAIN MENU SCREEN -->
     <div id="main-menu" class="screen active-screen">
-        <div class="header-container">
-            <div class="header-icon">✦</div>
-            <h1>Horoscope</h1>
+        <div class="header">
+            <h1>Vibe & Luck</h1>
             <div class="subtitle">MINI APP</div>
         </div>
-
-        <div class="grid-container">
-            <div class="card" onclick="navigate('daily-draw-screen')">
-                <div class="card-visual">🃏</div>
+        
+        <div class="grid">
+            <div class="card" onclick="navigate('daily-draw-hub')">
+                <div class="card-icon">🃏</div>
                 <div class="card-title">Daily Card Draw</div>
             </div>
-            
-            <div class="card" onclick="navigate('love-match-screen')">
-                <div class="card-visual">❤️</div>
+            <div class="card" onclick="navigate('love-match-hub')">
+                <div class="card-icon">❤️</div>
                 <div class="card-title">Love Match</div>
             </div>
-            
-            <div class="card" onclick="navigate('breakup-support-screen')">
-                <div class="card-visual">💔</div>
+            <div class="card" onclick="navigate('breakup-support-hub')">
+                <div class="card-icon">💔</div>
                 <div class="card-title">Breakup Support</div>
             </div>
-            
-            <div class="card" onclick="navigate('mood-forecast-screen')">
-                <div class="card-visual">🧿</div>
+            <div class="card" onclick="navigate('mood-forecast-hub')">
+                <div class="card-icon">🧿</div>
                 <div class="card-title">Mood Forecast</div>
             </div>
-            
-            <div class="card" onclick="navigate('horoscope-screen')">
-                <div class="card-visual">♈</div>
+            <div class="card" onclick="navigate('horoscope-hub')">
+                <div class="card-icon">♈</div>
                 <div class="card-title">Horoscope</div>
             </div>
-            
-            <div class="card" onclick="navigate('lucky-numbers-screen')">
-                <div class="card-visual">🎲</div>
+            <div class="card" onclick="navigate('lucky-numbers-hub')">
+                <div class="card-icon">🎲</div>
                 <div class="card-title">Lucky Numbers</div>
             </div>
         </div>
     </div>
 
-    <!-- PLACEHOLDER SCREENS (To prove the router works) -->
-    <div id="daily-draw-screen" class="screen">
-        <h2 style="color: var(--text-accent);">Daily Card Draw Engine</h2>
-        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint A)</p>
-        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
-    </div>
-    <div id="love-match-screen" class="screen">
-        <h2 style="color: var(--text-accent);">Love Match Hub</h2>
-        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint B)</p>
-        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
-    </div>
-    <div id="breakup-support-screen" class="screen">
-        <h2 style="color: var(--text-accent);">Healing Rituals</h2>
-        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint C)</p>
-        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
-    </div>
-    <div id="mood-forecast-screen" class="screen">
-        <h2 style="color: var(--text-accent);">Mood Forecast</h2>
-        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint D)</p>
-        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
-    </div>
-    <div id="horoscope-screen" class="screen">
-        <h2 style="color: var(--text-accent);">Horoscope</h2>
-        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint E)</p>
-        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
-    </div>
-    <div id="lucky-numbers-screen" class="screen">
-<h2 style="color: var(--text-accent);">Lucky Numbers</h2>
-        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint F)</p>
-        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    <!-- ========================================== -->
+    <!-- 1. DAILY CARD DRAW SCREENS                 -->
+    <!-- ========================================== -->
+    
+    <!-- CATEGORY SELECTION -->
+    <div id="daily-draw-hub" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Daily Guidance</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Where do you need clarity?</p>
+        </div>
+        <div class="action-btn" onclick="goToDraw('career')">Finances & Career</div>
+        <div class="action-btn" onclick="goToDraw('love')">Love & Romance</div>
+        <div class="action-btn" onclick="goToDraw('social')">Friendships & Social Life</div>
+        <div class="action-btn" onclick="goToDraw('peace')">Inner Peace & Mindfulness</div>
+        <div class="action-btn" onclick="goToDraw('choices')">Big Choices & Crossroads</div>
+        <div class="action-btn" onclick="goToDraw('closure')">Letting Go & Moving On</div>
+        <div style="margin-top: 25px; color: var(--text-muted); cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
     </div>
 
-    <!-- CORE JAVASCRIPT ROUTER -->
+    <!-- 3-CARD DRAW DECK -->
+    <div id="draw-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Trust Your Intuition</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Pick one card to reveal your path.</p>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+           <div class="card" style="width: 60px; height: 90px; justify-content: center; font-size: 24px;" onclick="revealCard()">✦</div>
+           <div class="card" style="width: 60px; height: 90px; justify-content: center; font-size: 24px;" onclick="revealCard()">✦</div>
+           <div class="card" style="width: 60px; height: 90px; justify-content: center; font-size: 24px;" onclick="revealCard()">✦</div>
+        </div>
+        <div style="margin-top: 40px; color: var(--text-muted); cursor: pointer;" onclick="navigate('daily-draw-hub')">Cancel</div>
+    </div>
+
+    <!-- REVEAL RESULT -->
+    <div id="reveal-screen" class="screen">
+        <h2 id="card-title" style="color: var(--text-main); margin-bottom: 5px;">Card Name</h2>
+        <h3 style="color: var(--text-gold); font-size: 14px; margin-top: 30px;">Daily Focus</h3>
+        <p id="card-focus" style="font-size: 14px; color: var(--text-muted); line-height: 1.6; padding: 0 15px;"></p>
+        <h3 style="color: var(--text-gold); font-size: 14px; margin-top: 25px;">Action Step</h3>
+        <p id="card-step" style="font-size: 14px; color: var(--text-muted); line-height: 1.6; font-style: italic; padding: 0 15px;"></p>
+        <div class="action-btn" onclick="navigate('main-menu')" style="margin-top: 40px;">Close Daily Reading</div>
+    </div>
+        <!-- ========================================== -->
+    <!-- 2. LOVE MATCH SCREENS                      -->
+    <!-- ========================================== -->
+    
+    <!-- LOVE MATCH HUB -->
+    <div id="love-match-hub" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Love Match</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Select your cosmic tool.</p>
+        </div>
+        <div class="action-btn" onclick="navigate('synastry-input-screen')">Cosmic Synastry (Elements)</div>
+        <div class="action-btn" onclick="navigate('flames-input-screen')">FLAMES Calculator (Names)</div>
+        <div style="margin-top: 30px; color: var(--text-muted); cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+
+    <!-- SYNASTRY INPUT SCREEN -->
+    <div id="synastry-input-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Cosmic Synastry</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Check elemental compatibility.</p>
+        </div>
+        <div style="margin: 20px auto; text-align: left; max-width: 250px;">
+            <label style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">Your Element</label>
+            <select id="user-sign" style="width: 100%; padding: 12px; box-sizing: border-box; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 8px; font-size: 14px; outline: none;">
+                <option value="fire">Fire (Aries, Leo, Sagittarius)</option>
+                <option value="earth">Earth (Taurus, Virgo, Capricorn)</option>
+                <option value="air">Air (Gemini, Libra, Aquarius)</option>
+                <option value="water">Water (Cancer, Scorpio, Pisces)</option>
+            </select>
+            <label style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">Their Element</label>
+            <select id="crush-sign" style="width: 100%; padding: 12px; box-sizing: border-box; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 8px; font-size: 14px; outline: none;">
+                <option value="fire">Fire (Aries, Leo, Sagittarius)</option>
+                <option value="earth">Earth (Taurus, Virgo, Capricorn)</option>
+                <option value="air">Air (Gemini, Libra, Aquarius)</option>
+                <option value="water">Water (Cancer, Scorpio, Pisces)</option>
+            </select>
+        </div>
+        <div class="action-btn" onclick="calculateSynastry()">Calculate Match</div>
+        <div style="margin-top: 20px; color: var(--text-muted); cursor: pointer;" onclick="navigate('love-match-hub')">Back</div>
+    </div>
+
+    <!-- FLAMES INPUT SCREEN -->
+    <div id="flames-input-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">FLAMES Engine</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">The classic energy calculator.</p>
+        </div>
+        <div style="margin: 20px auto; text-align: left; max-width: 250px;">
+            <label style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">Your Name</label>
+            <input type="text" id="flames-name1" placeholder="Enter first name" style="width: 100%; padding: 12px; box-sizing: border-box; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 8px; font-size: 14px; outline: none;">
+            <label style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">Their Name</label>
+            <input type="text" id="flames-name2" placeholder="Enter their name" style="width: 100%; padding: 12px; box-sizing: border-box; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 8px; font-size: 14px; outline: none;">
+            </div>
+        <div class="action-btn" onclick="calculateFlames()">Calculate Energy</div>
+        <div style="margin-top: 20px; color: var(--text-muted); cursor: pointer;" onclick="navigate('love-match-hub')">Back</div>
+    </div>
+
+    <!-- LOVE MATCH REVEAL SCREEN -->
+    <div id="love-match-reveal" class="screen">
+        <h2 id="match-title" style="color: var(--text-gold); margin-bottom: 5px;">Match Result</h2>
+        <h1 id="match-score" style="font-size: 48px; margin: 15px 0; color: var(--text-main); text-shadow: 0 0 20px rgba(255,255,255,0.3);"></h1>
+        <p id="match-desc" style="font-size: 14px; color: var(--text-muted); line-height: 1.6; padding: 0 15px; margin-bottom: 30px;"></p>
+        <div class="action-btn" onclick="navigate('love-match-hub')">Calculate Another</div>
+        <div style="margin-top: 20px; color: var(--text-muted); cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+        <!-- ========================================== -->
+    <!-- 3. BREAKUP SUPPORT SCREENS                 -->
+    <!-- ========================================== -->
+
+    <!-- BREAKUP SUPPORT HUB -->
+    <div id="breakup-support-hub" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Healing Rituals</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Choose your path to closure.</p>
+        </div>
+        <div class="action-btn" onclick="navigate('void-text-screen')">The Void Text</div>
+        <div class="action-btn" onclick="navigate('shattered-moon-screen')">The Shattered Moon</div>
+        <div class="action-btn" onclick="navigate('cleanse-challenge-screen')">30-Day Cleanse</div>
+        <div style="margin-top: 30px; color: var(--text-muted); cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+
+    <!-- THE VOID TEXT -->
+    <div id="void-text-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">The Void</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Type everything you wish you could say.</p>
+        </div>
+        <textarea id="void-input" placeholder="Let it all out here... it won't be saved." style="width: 90%; max-width: 320px; height: 150px; background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); color: var(--text-main); padding: 15px; border-radius: 12px; font-size: 14px; outline: none; resize: none; margin-bottom: 20px; box-sizing: border-box;"></textarea>
+        <div class="action-btn" id="void-btn" onclick="releaseVoid()">Release into the Void</div>
+        <p id="void-message" style="display: none; color: var(--text-gold); font-style: italic; margin-top: 20px;"></p>
+        <div style="margin-top: 20px; color: var(--text-muted); cursor: pointer;" onclick="navigate('breakup-support-hub')">Back</div>
+    </div>
+
+    <!-- SHATTERED MOON -->
+    <div id="shattered-moon-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Kintsugi Moon</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Tap the fractures to mend them with gold.</p>
+        </div>
+        <div style="position: relative; width: 150px; height: 150px; border-radius: 50%; background: #1a1e3a; margin: 30px auto; overflow: hidden; box-shadow: 0 0 30px rgba(100,150,255,0.2);">
+            <div id="fracture-1" onclick="mendMoon(1)" style="position: absolute; top: 0; left: 0; width: 50%; height: 50%; border-right: 2px dashed #4a557a; border-bottom: 2px dashed #4a557a; cursor: pointer; transition: 0.3s;"></div>
+            <div id="fracture-2" onclick="mendMoon(2)" style="position: absolute; top: 0; right: 0; width: 50%; height: 60%; border-bottom: 2px dashed #4a557a; cursor: pointer; transition: 0.3s;"></div>
+            <div id="fracture-3" onclick="mendMoon(3)" style="position: absolute; bottom: 0; left: 20%; width: 60%; height: 50%; cursor: pointer; transition: 0.3s;"></div>
+        </div>
+        <p id="moon-message" style="color: var(--text-muted); font-size: 14px; min-height: 40px;">3 fractures remain.</p>
+        <div style="margin-top: 20px; color: var(--text-muted); cursor: pointer;" onclick="navigate('breakup-support-hub')">Back</div>
+    </div>
+
+    <!-- 30-DAY CLEANSE -->
+    <div id="cleanse-challenge-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">30-Day Cleanse</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">One micro-step at a time.</p>
+        </div>
+        <div style="background: var(--card-bg); border: 1px solid var(--text-gold); border-radius: 18px; padding: 30px 20px; max-width: 300px; margin: 0 auto 20px; box-shadow: 0 0 20px rgba(249, 217, 118, 0.15);">
+            <h3 style="margin: 0 0 10px 0; color: var(--text-gold);">Day <span id="cleanse-day">1</span></h3>
+            <p id="cleanse-task" style="font-size: 16px; color: var(--text-main); margin-bottom: 25px;">Mute their stories on all socials.</p>
+            <div class="action-btn" id="cleanse-btn" onclick="completeCleanseTask()" style="width: 100%;">Mark as Done</div>
+        </div>
+        <div style="margin-top: 20px; color: var(--text-muted); cursor: pointer;" onclick="navigate('breakup-support-hub')">Back</div>
+    </div>
+        <!-- ========================================== -->
+    <!-- 4. MOOD FORECAST SCREENS                   -->
+    <!-- ========================================== -->
+
+    <!-- MOOD FORECAST HUB -->
+    <div id="mood-forecast-hub" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Mood Forecast</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Scan your energy for today.</p>
+        </div>
+        <div class="action-btn" onclick="navigate('aura-scanner-screen')">The Aura Scanner</div>
+        <div class="action-btn" onclick="navigate('vibe-roulette-screen')">Vibe Check Roulette</div>
+        <div style="margin-top: 30px; color: var(--text-muted); cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+
+    <!-- AURA SCANNER -->
+    <div id="aura-scanner-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Aura Scanner</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Tap and hold the orb for 3 seconds.</p>
+        </div>
+        <div id="aura-orb" onmousedown="startAuraScan()" onmouseup="stopAuraScan()" ontouchstart="startAuraScan()" ontouchend="stopAuraScan()" style="width: 120px; height: 120px; background: radial-gradient(circle, #4a557a 0%, #1a1e3a 80%); border-radius: 50%; margin: 40px auto; box-shadow: 0 0 30px rgba(100,150,255,0.3); transition: all 3s ease; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer;">
+            🧿
+        </div>
+        <p id="aura-status" style="color: var(--text-muted); height: 20px;">Awaiting scan...</p>
+        <div style="margin-top: 30px; color: var(--text-muted); cursor: pointer;" onclick="navigate('mood-forecast-hub')">Back</div>
+    </div>
+
+    <!-- VIBE ROULETTE -->
+    <div id="vibe-roulette-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Vibe Roulette</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Let the chaos decide.</p>
+        </div>
+        <div style="background: var(--card-bg); border: 2px solid var(--text-gold); border-radius: 12px; padding: 20px; margin: 30px auto; max-width: 250px; font-size: 24px; font-weight: bold; color: var(--text-main); height: 40px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <span id="roulette-text">???</span>
+        </div>
+        <div class="action-btn" onclick="spinRoulette()">Spin the Wheel</div>
+        <div style="margin-top: 30px; color: var(--text-muted); cursor: pointer;" onclick="navigate('mood-forecast-hub')">Back</div>
+    </div>
+
+    <!-- MOOD REVEAL -->
+    <div id="mood-reveal-screen" class="screen">
+        <h2 id="mood-title" style="color: var(--text-gold); margin-bottom: 5px;">Your Vibe</h2>
+        <p id="mood-desc" style="font-size: 16px; color: var(--text-main); line-height: 1.6; padding: 0 15px; margin: 20px 0;"></p>
+        <div class="action-btn" onclick="navigate('mood-forecast-hub')">Try Again</div>
+        <div style="margin-top: 20px; color: var(--text-muted); cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 5. HOROSCOPE SCREENS                       -->
+    <!-- ========================================== -->
+
+    <!-- HOROSCOPE HUB / SIGN SELECTOR -->
+    <div id="horoscope-hub" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Cosmic Tea</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Select your sign for today's truth.</p>
+        </div>
+        <select id="horoscope-sign" style="width: 90%; max-width: 320px; padding: 15px; margin-bottom: 25px; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 12px; font-size: 16px; outline: none; text-align: center;">
+            <option value="aries">Aries</option><option value="taurus">Taurus</option>
+            <option value="gemini">Gemini</option><option value="cancer">Cancer</option>
+            <option value="leo">Leo</option><option value="virgo">Virgo</option>
+            <option value="libra">Libra</option><option value="scorpio">Scorpio</option>
+            <option value="sagittarius">Sagittarius</option><option value="capricorn">Capricorn</option>
+            <option value="aquarius">Aquarius</option><option value="pisces">Pisces</option>
+        </select>
+        <div class="action-btn" onclick="spillTheTea()">Spill the Tea</div>
+        <div style="margin-top: 30px; color: var(--text-muted); cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+
+    <!-- HOROSCOPE REVEAL -->
+    <div id="horoscope-reveal-screen" class="screen">
+        <h2 id="horoscope-title" style="color: var(--text-gold); margin-bottom: 15px; text-transform: capitalize;">Sign</h2>
+        
+        <div style="background: rgba(255, 50, 50, 0.1); border: 1px solid rgba(255, 50, 50, 0.3); border-radius: 12px; padding: 15px; margin: 15px auto; max-width: 300px; text-align: left;">
+            <span style="font-size: 18px;">🚩</span> <strong style="color: #ff6b6b; font-size: 14px;">RED FLAG:</strong>
+            <p id="horoscope-red" style="font-size: 13px; color: var(--text-main); margin: 5px 0 0 0;"></p>
+        </div>
+        
+        <div style="background: rgba(50, 255, 100, 0.1); border: 1px solid rgba(50, 255, 100, 0.3); border-radius: 12px; padding: 15px; margin: 15px auto; max-width: 300px; text-align: left;">
+            <span style="font-size: 18px;">🟩</span> <strong style="color: #4ade80; font-size: 14px;">GREEN FLAG:</strong>
+            <p id="horoscope-green" style="font-size: 13px; color: var(--text-main); margin: 5px 0 0 0;"></p>
+        </div>
+
+        <h3 style="color: var(--text-gold); font-size: 14px; margin-top: 25px;">The Truth</h3>
+        <p id="horoscope-tea" style="font-size: 14px; color: var(--text-muted); line-height: 1.6; padding: 0 15px; font-style: italic;"></p>
+        
+        <div class="action-btn" onclick="navigate('main-menu')" style="margin-top: 30px;">Close</div>
+    </div>
+        <!-- ========================================== -->
+    <!-- 6. LUCKY NUMBERS SCREENS                   -->
+    <!-- ========================================== -->
+
+    <!-- LUCKY NUMBERS HUB -->
+    <div id="lucky-numbers-hub" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Synchronicity</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Decode your cosmic coordinates.</p>
+        </div>
+        <div class="action-btn" onclick="navigate('scratch-off-screen')">The Cosmic Scratch-Off</div>
+        <div class="action-btn" onclick="navigate('angel-number-screen')">Angel Number Generator</div>
+        <div style="margin-top: 30px; color: var(--text-muted); cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+
+    <!-- SCRATCH-OFF SCREEN -->
+    <div id="scratch-off-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Scratch & Reveal</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Tap to reveal your 3 lucky digits.</p>
+        </div>
+        <div id="scratch-card" onclick="revealScratchOff()" style="background: linear-gradient(135deg, rgba(40,45,90,0.8), rgba(20,25,50,0.9)); border: 2px dashed var(--text-gold); border-radius: 12px; width: 250px; height: 120px; margin: 30px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(249, 217, 118, 0.1);">
+            <span id="scratch-content" style="font-size: 20px; color: var(--text-main);">Tap to scratch ✨</span>
+        </div>
+        <p id="scratch-prediction" style="font-size: 14px; color: var(--text-muted); padding: 0 15px; min-height: 40px;"></p>
+        <div style="margin-top: 30px; color: var(--text-muted); cursor: pointer;" onclick="navigate('lucky-numbers-hub')">Back</div>
+    </div>
+
+    <!-- ANGEL NUMBER SCREEN -->
+    <div id="angel-number-screen" class="screen">
+        <div class="header">
+            <h2 style="color: var(--text-gold); margin: 0;">Spiritual Code</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Tap to download your sync sequence.</p>
+        </div>
+        <h1 id="angel-code" style="font-size: 54px; margin: 20px 0; color: var(--text-main); text-shadow: 0 0 25px rgba(100,150,255,0.5);">000</h1>
+        <h3 id="angel-meaning-title" style="color: var(--text-gold); font-size: 16px;">Waiting for signal...</h3>
+        <p id="angel-task" style="font-size: 14px; color: var(--text-muted); line-height: 1.6; padding: 0 15px; margin-bottom: 30px;"></p>
+        <div class="action-btn" onclick="generateAngelNumber()">Download Code</div>
+        <div style="margin-top: 20px; color: var(--text-muted); cursor: pointer;" onclick="navigate('lucky-numbers-hub')">Back</div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CORE JAVASCRIPT LOGIC                      -->
+    <!-- ========================================== -->
     <script>
+        // Telegram WebApp Initialization
         const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : {};
         if (typeof tg.ready === 'function') {
             tg.ready();
             tg.expand();
-            try {
-                tg.setHeaderColor('#0a0b1a');
-                tg.setBackgroundColor('#161122');
-            } catch (e) {}
+            try { tg.setHeaderColor('#060814'); tg.setBackgroundColor('#121026'); } catch (e) {}
         }
 
         // Master Navigation Router
         function navigate(targetScreenId) {
-            // Hide all screens
             const screens = document.querySelectorAll('.screen');
-            screens.forEach(screen => {
-                screen.classList.remove('active-screen');
-            });
+            screens.forEach(screen => screen.classList.remove('active-screen'));
             
-            // Show target screen
             const targetScreen = document.getElementById(targetScreenId);
-            if (targetScreen) {
-                targetScreen.classList.add('active-screen');
-            }
+            if (targetScreen) targetScreen.classList.add('active-screen');
             
-            // Native button tap vibration
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+        // --- 1. DAILY CARD DRAW ENGINE (FULL 180 CARDS) ---
+        let currentCategory = "";
+        const rawDB = {
+            career: "The Grind|Discipline pays the bills.|Do the hardest task first.^The Architect|Structure outlasts motivation.|Map your 3-month goal.^The Leech|A hidden expense is draining you.|Check your subscriptions.^The Bluff|Imposter syndrome is lying.|Speak up in your next meeting.^The Harvest|Past work is ripening.|Follow up on an old lead.^The Void|Burnout is approaching.|Stop working at 6 PM sharp.^The Pivot|The current path is a dead end.|Research a new skill today.^The Magnet|Your energy is attracting wealth.|Send that bold email.^The Hoarder|Scarcity mindset blocks flow.|Invest in a tool you need.^The Maverick|Safe choices yield safe results.|Pitch the crazy idea.^The Slog|Endurance is your only play right now.|Put your head down and work.^The Mirror|Your workspace reflects your mind.|Clean your desk immediately.^The Bridge|A connection holds the key.|Network with someone outside your field.^The Leak|Small habits cost big money.|Pack your lunch tomorrow.^The Crown|Step into your authority.|Stop using 'just' in emails.^The Anchor|You are too comfortable.|Apply for something you aren't qualified for.^The Spark|A side passion has profit potential.|Spend 20 minutes on your hobby.^The Ghost|An opportunity has expired.|Let it go and move forward.^The Negotiator|You are underpricing yourself.|Raise your rate or ask for more.^The Alchemist|Turn current stress into fuel.|Use your frustration to finish the project.^The Web|Your network is stale.|Reconnect with a former mentor.^The Scale|Balance is currently non-existent.|Prioritize rest to boost output.^The Scout|Look ahead, not at your feet.|Update your resume tonight.^The Vault|Protect your intellectual property.|Stop oversharing your ideas.^The Catalyst|You need to force a change.|Make the decision you're avoiding.^The Oasis|Rest is a business strategy.|Take a full lunch break away from screens.^The Shadow|Jealousy is showing you what you want.|Analyze why that person triggers you.^The Forge|Pressure is refining your skills.|Accept the difficult feedback.^The Lighthouse|You are meant to lead this.|Volunteer for the project.^The Reset|The system is broken.|Rebuild your daily routine.",
+            love: "The Mirror|You attract what you reflect.|Focus on your own joy today.^The Spark|New energy is entering.|Be open to unexpected conversations.^The Wall|Your boundaries are too rigid.|Let someone in slightly more.^The Doormat|You are over-compromising.|Say no to something small today.^The Ghost|They are showing you who they are.|Stop checking their activity.^The Flame|Passion is overriding logic.|Take a step back and observe.^The Anchor|True love is safe, not chaotic.|Appreciate the boring moments.^The Illusion|You are romanticizing potential.|Look at their actual actions.^The Chase|Pursuit is exhausting you.|Pull back your energy.^The Garden|Love requires daily tending.|Do a small act of service.^The Storm|An argument is brewing.|Choose peace over being right.^The Key|Vulnerability unlocks depth.|Share a fear with your partner.^The Veil|You are hiding your true self.|State a real opinion today.^The Scales|The effort is unbalanced.|Match their level of investment.^The Compass|You know what you need.|Communicate your standard clearly.^The Desert|You are running on empty.|Schedule a solo date night.^The Magnet|Confidence is your best trait.|Dress up just for yourself.^The Echo|Past trauma is speaking.|Question your current trigger.^The Puzzle|You are trying to fix them.|Focus on fixing your own life.^The Sunrise|A fresh start is here.|Forgive a minor transgression.^The Thief|Someone is stealing your peace.|Set a firm boundary.^The Crown|Never beg for attention.|Walk away from breadcrumbs.^The Bridge|Connection requires a step forward.|Send a thoughtful text.^The Mask|They are not being authentic.|Trust your gut feeling.^The Fire|Sensuality needs awakening.|Light a candle and be present.^The Ice|You are emotionally withdrawn.|Tell someone how you feel.^TheMap|You lack relationship goals.|Write down your ideal dynamic.^The River|Let things flow naturally.|Stop trying to control the outcome.^The Treasure|You already have what you need.|Practice gratitude for current love.^The Leap|It's time to take a risk.|Tell them how you really feel.",
+            social: "The Prune|Let go of one-sided bonds.|Stop reaching out first.^The Anchor|Deepen your real connections.|Check in on your closest friend.^The Vampire|Someone is draining your energy.|Limit contact with the complainer.^The Moth|You are drawn to drama.|Mute the chaotic group chat.^The Lighthouse|Be a beacon for others.|Offer genuine praise to a peer.^The Mirror|You are projecting your insecurities.|Apologize if you were defensive.^The Bridge|Mend a broken fence.|Reach out to an estranged friend.^The Wall|You are isolating yourself.|Say yes to the next invitation.^The Echo|Gossip will backfire.|Refuse to participate in rumors.^The Spark|A new friendship is blooming.|Suggest a casual coffee meetup.^The Shield|Protect your free time.|Decline an event you dread.^The Magnet|Your vibe attracts your tribe.|Be unapologetically yourself today.^The Chameleon|You are losing your identity.|Express a dissenting opinion.^The Vault|A friend needs your discretion.|Keep their secret strictly safe.^The Catalyst|Your group needs leadership.|Plan the next hangout.^The Oasis|Social fatigue is real.|Take 24 hours off social media.^The Crown|Demand basic respect.|Call out a passive-aggressive comment.^The Root|Shared history isn't enough.|Evaluate if you still align.^The Blossom|Show up for their big moment.|Send a congratulatory note.^The Storm|Friction is necessary for growth.|Have the difficult conversation.^The Map|You are outgrowing this circle.|Seek a new community space.^The River|Let people come and go.|Release the need to hold on.^The Treasure|Quality over quantity.|Cancel generic plans for a deep talk.^The Fire|Your circle lacks passion.|Introduce a new activity.^The Ice|A friendship has cooled off.|Decide if it's worth reviving.^The Lens|You are judging too harshly.|Give someone the benefit of the doubt.^The Canvas|Create a shared memory.|Take photos together today.^The Stage|Let someone else shine.|Ask a friend about their win.^The Anchor|Be the reliable one today.|Follow through on your promise.^The Leap|Expand your social horizons.|Talk to a stranger.",
+            peace: "The Pause|Silence is a weapon.|Sit in silence for 5 minutes.^The Reset|Your nervous system needs rest.|Unplug 30 minutes before bed.^The Breath|You are holding onto tension.|Do 10 deep belly breaths.^The Stream|Thoughts are passing clouds.|Observe anxiety without reacting.^The Anchor|Ground yourself in the present.|Notice 5 things you can see.^The Shield|Protect your morning peace.|Don't check your phone for 1 hour.^The Void|You need empty space.|Clear your schedule for the evening.^The Mirror|Self-criticism is loud today.|Write down 3 things you like about yourself.^The Root|Connect with the physical world.|Walk barefoot on the floor.^The Canopy|Get a broader perspective.|Remind yourself this won't matter in 5 years.^The River|Stop fighting the current.|Accept what you cannot change today.^The Stone|Become unbothered.|Respond to drama with silence.^The Flame|Burn away the mental fog.|Journal your brain dump.^The Oasis|Hydration is self-care.|Drink a large glass of water now.^The Cocoon|Withdraw to heal.|Wrap yourself in a blanket and rest.^The Sun|You need natural light.|Step outside for 10 minutes.^The Canvas|Your mind is cluttered.|Tidy your immediate environment.^The Bell|Acknowledge the transition.|Take a breath between tasks.^The Feather|Take things less seriously.|Watch something that makes you laugh.^The Mountain|Stand firm in your peace.|Refuse to absorb others' panic.^The Echo|Your past is disturbing your present.|Forgive yourself for that mistake.^The Key|Action cures anxiety.|Do the small task you're dreading.^The Veil|Limit sensory input.|Turn off background noise/music.^The Compass|Align with your core values.|Say no to a conflicting request.^TheTreasure|Gratitude shifts the mind.|List 3 simple things you're thankful for.^The Spark|Joy is a choice.|Do one purely fun thing today.^The Ice|Cool down your reactions.|Wait 10 minutes before replying to that text.^The Leap|Trust that you are safe.|Release muscle tension in your shoulders.^The Crown|You control your inner world.|Choose a calm response.^The Map|Plan tomorrow to ease today.|Write tomorrow's to-do list now.",
+            choices: "The Fork|Overthinking paralyzes.|Flip a coin to reveal your gut feeling.^The Leap|Fear means you're growing.|Take the risk you've been avoiding.^The Scale|Weigh the long-term impact.|Ask: Will I regret not doing this?^The Anchor|Stay put for now.|Delay the decision by 24 hours.^The Compass|Your intuition is screaming.|Ignore logic and trust your gut.^The Map|You lack information.|Research one more key detail.^The Mirror|You are choosing out of ego.|Choose what brings peace, not pride.^The Wall|An obstacle is actually a sign.|Pivot to the alternative route.^The Door|An opportunity is closing soon.|Make the choice today.^The Key|The answer is already inside you.|Journal about the worst-case scenario.^The Lighthouse|Seek wise counsel.|Ask a mentor for their perspective.^The Storm|Emotions are clouding judgment.|Wait until you are calm to decide.^The Void|Saying no is a complete choice.|Decline the offer gracefully.^The Spark|Follow the path of most excitement.|Choose the option that feels alive.^The Bridge|Compromise is the best route.|Find the middle ground.^The Root|Choose stability right now.|Opt for the safest bet.^The Crown|Take ownership of the outcome.|Stop asking others what to do.^The Echo|You've made this mistake before.|Choose differently this time.^The Treasure|Invest in your future self.|Pick the option with delayed gratification.^The Flame|Burn the boats.|Commit fully to one direction.^The Ice|Freeze the process.|You don't have to decide right now.^The Canvas|Create a third option.|Negotiate a custom solution.^The Shield|Protect your core boundaries.|Reject any choice that compromises your values.^The River|Go with the flow.|Let circumstances make the choice.^The Mountain|Take the harder path.|Choose the option that requires discipline.^The Lens|Look at the big picture.|Factor in your 5-year plan.^The Blossom|Choose growth over comfort.|Accept the challenging role.^The Vault|Keep your decision private for now.|Don't announce your next move yet.^The Sun|Choose the optimistic route.|Assume things will work out.^The Reset|Start the decision process over.|Scrap current options and brainstorm new ones.",
+            closure: "The Ghost|Closure comes from within.|Delete that old message thread.^The Sunrise|Every ending is a start.|Do something completely new today.^The Ash|Let it burn to the ground.|Stop trying to salvage the unsalvageable.^The River|Wash away the resentment.|Write a forgiveness letter and destroy it.^The Anchor|You are tied to a dead weight.|Throw away one physical memento.^The Mirror|You played a part in the ending.|Accept your fraction of the blame.^The Vault|Seal the memory away.|Archive their photos.^The Bridge|Cross over and don't look back.|Unfollow them on social media.^The Echo|The narrative is keeping you trapped.|Stop talking about it for 24 hours.^The Root|Uproot the lingering hope.|Say out loud: It is truly over.^The Storm|Feel the grief fully.|Allow yourself to cry without guilt.^The Oasis|Find comfort in the aftermath.|Treat yourself to your favorite meal.^The Canvas|A blank slate awaits.|Plan a solo trip or weekend activity.^The Flame|Transform pain into power.|Channel the anger into a workout.^The Shield|Block their access to you.|Enforce strict no-contact.^The Key|You hold your own freedom.|Forgive yourself for staying too long.^The Crown|Reclaim your sovereignty.|List 3 things you love about your independence.^The Spark|Reconnect with who you were.|Engage in a hobby you abandoned.^The Lens|View the ending as a lesson.|Write down 3 things this taught you.^The Treasure|Keep the good, release the bad.|Acknowledge one positive memory, thenlet it go.^The Mountain|The climb out is hard but worth it.|Focus on one productive task.^The Leap|Step into the unknown.|Say yes to a completely unexpected plan.^The Sun|The darkness is lifting.|Notice one beautiful thing today.^The Cocoon|The healing phase is ending.|Buy yourself a new item of clothing.^The Bell|The final chime has rung.|Ritually burn a piece of paper with their name.^The Feather|The burden is lightening.|Take a deep breath and physically shake it off.^The Ice|The emotional attachment is freezing over.|Observe your lack of reaction.^The Map|Chart a new course.|Set a new goal unrelated to the past.^The Door|Close it firmly.|Send the final text, or delete their number.^The Reset|You are renewed.|Clean your living space completely."
+        };
+        const cardsDB = {};
+        for (let c in rawDB) cardsDB[c] = rawDB[c].split('^').map(s => { let p = s.split('|'); return {title: p[0], focus: p[1], step: p[2]}; });
+
+        function goToDraw(cat) { currentCategory = cat; navigate('draw-screen'); }
+        function revealCard() {
+            const list = cardsDB[currentCategory];
+            const card = list[Math.floor(Math.random() * list.length)];
+            document.getElementById('card-title').innerText = card.title;
+            document.getElementById('card-focus').innerText = card.focus;
+            document.getElementById('card-step').innerText = card.step;
+            navigate('reveal-screen');
+        }
+
+        // --- 2. LOVE MATCH ENGINE ---
+        function calculateSynastry() {
+            const u = document.getElementById('user-sign').value, c = document.getElementById('crush-sign').value;
+            let score = 50, desc = "A unique connection. It takes work, but growth is possible.";
+            if (u === c) { score = 95; desc = "Twin flames! Your energies are perfectly mirrored."; }
+            else if ((u==='fire'&&c==='air')(u==='air'&&c==='fire')(u==='earth'&&c==='water')||(u==='water'&&c==='earth')) { score = 85; desc = "Highly compatible. You naturally fuel and support each other."; }
+            else if ((u==='fire'&&c==='water')||(u==='water'&&c==='fire')) { score = 40; desc = "Steamy but volatile. Proceed with boundaries."; }
+            document.getElementById('match-title').innerText = "Cosmic Synastry";
+            document.getElementById('match-score').innerText = score + "%";
+            document.getElementById('match-score').style.fontSize = "48px";
+            document.getElementById('match-desc').innerText = desc;
+            navigate('love-match-reveal');
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        function calculateFlames() {
+            let n1 = document.getElementById('flames-name1').value.toLowerCase().replace(/\s/g, ''), n2 = document.getElementById('flames-name2').value.toLowerCase().replace(/\s/g, '');
+            if (!n1 || !n2) return;
+            for (let i = 0; i < n1.length; i++) if (n2.includes(n1[i])) { n2 = n2.replace(n1[i], ''); n1 = n1.replace(n1[i], ''); i--; }
+            const res = [ ["Friends", "Strictly platonic vibes."], ["Lovers", "Deep romantic connection."], ["Affection", "Sweet and steady affection."], ["Marriage", "Long-term commitment energy."], ["Enemies", "Red flags and friction."], ["Siblings", "Like family, but chaotic."] ];
+            let count = n1.length + n2.length;
+            let idx = count > 0 ? (count - 1) % 6 : 0;
+            document.getElementById('match-title').innerText = "FLAMES Verdict";
+            document.getElementById('match-score').innerText = res[idx][0];
+            document.getElementById('match-score').style.fontSize = "36px";
+            document.getElementById('match-desc').innerText = res[idx][1];
+            navigate('love-match-reveal');
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+        // --- 3. BREAKUP SUPPORT ENGINE ---
+        function releaseVoid() {
+            const input = document.getElementById('void-input');
+            if (!input.value.trim()) return;
+            input.value = '';
+            const msg = document.getElementById('void-message');
+            msg.innerText = "The void has consumed your words. You are lighter now.";
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 4000);
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        let fractures = 3;
+        function mendMoon(id) {
+            const frac = document.getElementById('fracture-' + id);
+            if (frac.style.borderColor === 'gold') return;
+            frac.style.borderColor = 'gold';
+            frac.style.borderStyle = 'solid';
+            frac.style.boxShadow = '0 0 15px rgba(249, 217, 118, 0.4)';
+            fractures--;
+            const msg = document.getElementById('moon-message');
+            if (fractures > 0) {
+                msg.innerText = fractures + " fracture" + (fractures > 1 ? "s" : "") + " remain.";
+            } else {
+                msg.innerText = "The moon is whole again, and so are you.";
+                msg.style.color = "var(--text-gold)";
             }
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        const cleanseTasks = "Mute their stories.|Delete one photo of you two.|Rearrange your bedroom.|Drink a coffee without your phone.|Write down 3 things you compromised on.|Unfollow their close friends.|Create a new morning playlist.|Throw away one physical reminder.|Try a new hobby for 20 mins.|Go for a walk in a new area.|Block them if you haven't yet.|List 5 things you love about being single.|Cook a meal they hated.|Archive old text conversations.|Do a 24h social media detox.|Buy new bedsheets.|Spend an evening with a neglected friend.|Write a letter you'll never send.|Rip up the letter you just wrote.|Treat yourself to something small.|Plan a solo weekend trip.|Start a new book or series.|Say 'no' to something you don't want to do.|Compliment a stranger.|Declutter your phone's contact list.|Go to sleep an hour earlier.|Reflect on how far you've come.|List 3 new goals for yourself.|Celebrate your independence.|You are free. Keep moving forward.".split('|');
+        let cleanseDay = parseInt(localStorage.getItem('vibe_cleanse_day')) || 1;
+        
+        function initCleanse() {
+            document.getElementById('cleanse-day').innerText = cleanseDay > 30 ? 30 : cleanseDay;
+            document.getElementById('cleanse-task').innerText = cleanseTasks[Math.min(cleanseDay - 1, 29)];
+            if (cleanseDay > 30) document.getElementById('cleanse-btn').style.display = 'none';
+        }
+        
+        function completeCleanseTask() {
+            if (cleanseDay > 30) return;
+            cleanseDay++;
+            localStorage.setItem('vibe_cleanse_day', cleanseDay);
+            initCleanse();
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+        initCleanse();
+        // --- 4. MOOD FORECAST ENGINE ---
+        let scanTimer = null;
+        function startAuraScan() {
+            const orb = document.getElementById('aura-orb');
+            const status = document.getElementById('aura-status');
+            orb.style.background = 'radial-gradient(circle, #ff758c 0%, #ff7eb3 100%)';
+            orb.style.boxShadow = '0 0 50px #ff758c';
+            status.innerText = "Reading thermal energy...";
+            scanTimer = setTimeout(() => {
+                const auras = [
+                    { name: "Crimson Spark", desc: "Your energy is electric and high-drive today. Channel this intensity into your most ambitious task." },
+                    { name: "Deep Indigo", desc: "You are operating on high intuition and mental clarity. Trust your gut over logic today." },
+                    { name: "Solar Gold", desc: "Magnetic and radiant energy surrounds you. People are naturally drawn to your presence." },
+                    { name: "Mystic Violet", desc: "You are processing deep internal shifts. Take time for solitude and rest." }
+                ];
+                const selected = auras[Math.floor(Math.random() * auras.length)];
+                document.getElementById('mood-title').innerText = selected.name;
+                document.getElementById('mood-desc').innerText = selected.desc;
+                navigate('mood-reveal-screen');
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            }, 3000);
+        }
+
+        function stopAuraScan() {
+            if (scanTimer) clearTimeout(scanTimer);
+            document.getElementById('aura-orb').style.background = 'radial-gradient(circle, #4a557a 0%, #1a1e3a 80%)';
+            document.getElementById('aura-orb').style.boxShadow = '0 0 30px rgba(100,150,255,0.3)';
+            document.getElementById('aura-status').innerText = "Awaiting scan...";
+        }
+
+        function spinRoulette() {
+            const vibes = ["Feral but Focused", "Soft & Sleepy", "Unapologetically Villainous", "Chaotically Productive", "Detached & Untouchable", "Overthinking Everything"];
+            let i = 0;
+            const el = document.getElementById('roulette-text');
+            const interval = setInterval(() => {
+                el.innerText = vibes[Math.floor(Math.random() * vibes.length)];
+                i++;
+                if (i > 15) {
+                    clearInterval(interval);
+                    const finalVibe = vibes[Math.floor(Math.random() * vibes.length)];
+                    el.innerText = finalVibe;
+                    document.getElementById('mood-title').innerText = "Today's Vibe: " + finalVibe;
+                    document.getElementById('mood-desc').innerText = "Embrace this exact energy today. Do not fight what your body and mind are asking for.";
+                    setTimeout(() => { navigate('mood-reveal-screen'); }, 800);
+                }
+            }, 80);
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        // --- 5. HOROSCOPE ENGINE ---
+        const horoscopeDB = {
+            aries: { red: "Starting arguments just to feel something.", green: "Channeling pure drive into your physical goals.", tea: "The universe is testing your patience today. If someone tries to drag you into their circus, simply buy a ticket and watch from afar. Do not engage." },
+            taurus: { red: "Refusing to budge on a minor detail out of pure stubbornness.", green: "Securing your peace and investing in your physical comfort.", tea: "You've been holding onto a grudge that is literally poisoning your nervous system. Drop it today. Your comfort is worth more than being right." },
+            gemini: { red: "Texting three different people back-to-back while avoiding your actual work.", green: "Rapid synthesis of new, highly profitable ideas.", tea: "Your brain has 40 tabs open and 3 of them are frozen. Pick one task, close the rest, and finish it before the sun goes down." },cancer: { red: "Ghosting everyone because someone looked at you slightly sideways.", green: "Deep emotional processing and fierce home protection.", tea: "Stop romanticizing the past just because the present requires effort. The door is locked for a reason; stop trying to look through the keyhole." },
+            leo: { red: "Fishing for compliments and getting mad when they aren't specific enough.", green: "Stepping into undisputed leadership without asking for permission.", tea: "You are the main character, but right now you're acting in a low-budget indie film. Raise your standards for who gets access to your energy today." },
+            virgo: { red: "Over-correcting someone else's mistake when it didn't even affect you.", green: "Flawless execution of a complex organizational system.", tea: "Not everything needs to be fixed. Sometimes people just want to vent, and sometimes situations just need to be left alone. Take a breath." },
+            libra: { red: "People-pleasing until you literally despise everyone involved.", green: "Creating absolute aesthetic harmony in your environment.", tea: "Indecision is a choice, and right now it's choosing stagnation. Pick the imperfect option and make it work." },
+            scorpio: { red: "Stalking an ex's LinkedIn profile because you ran out of Instagram accounts.", green: "Laser-focused transformation and absolute boundary enforcement.", tea: "Your intuition is shouting at you, but your loneliness is trying to negotiate. Listen to the shouting." },
+            sagittarius: { red: "Booking a flight you can't afford just to escape a minor inconvenience.", green: "Infectious optimism that opens a major door.", tea: "Freedom isn't running away from things; it's being completely at peace wherever you stand. Stop packing your bags and look inward." },
+            capricorn: { red: "Working yourself into a migraine over a deadline that doesn't matter.", green: "Cold, calculated execution that leaves competitors behind.", tea: "The hustle is great, but right now you're just running on a treadmill. Rest is part of the strategy, treat it as such." },
+            aquarius: { red: "Explaining your complex feelings via an unprompted philosophical essay.", green: "Brilliant, out-of-the-box problem solving.", tea: "You feel like an alien on this planet today. That's fine—lean into it. Build something weird and let the muggles catch up later." },
+            pisces: { red: "Building an elaborate fantasy life to avoid a 5-minute phone call.", green: "Profound artistic or spiritual breakthrough.", tea: "Reality is calling, and your voicemail is full. Ground yourself with a heavy meal or a walk outside before your imagination floats you away." }
+        };
+
+        function spillTheTea() {
+            const sign = document.getElementById('horoscope-sign').value;
+            const data = horoscopeDB[sign];
+            document.getElementById('horoscope-title').innerText = sign + " Daily Tea";
+            document.getElementById('horoscope-red').innerText = data.red;
+            document.getElementById('horoscope-green').innerText = data.green;
+            document.getElementById('horoscope-tea').innerText = data.tea;
+            navigate('horoscope-reveal-screen');
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        // --- 6. LUCKY NUMBERS ENGINE ---
+        function revealScratchOff() {
+            const n1 = Math.floor(Math.random() * 89) + 10;
+            const n2 = Math.floor(Math.random() * 89) + 10;
+            const n3 = Math.floor(Math.random() * 89) + 10;
+            const card = document.getElementById('scratch-card');
+            card.style.background = "linear-gradient(135deg, rgba(60,70,140,0.9), rgba(30,35,70,0.95))";
+            card.style.borderColor = "#4ade80";document.getElementById('scratch-content').innerHTML = <span style="font-size: 28px; font-weight: bold; color: var(--text-gold);">${n1} — ${n2} — ${n3}</span>;
+            document.getElementById('scratch-prediction').innerText = "Synchronicity is high. Keep your eyes open for repeating patterns on receipts or digital clocks today.";
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        function generateAngelNumber() {
+            const codes = ["111", "222", "333", "444", "555", "777", "888"];
+            const meanings = {
+                "111": "Manifestation Portal. Your thoughts are instantly translating into reality. Guard your mind.",
+                "222": "Divine Alignment. You are exactly where you are supposed to be. Trust the current trajectory.",
+                "333": "Ascended Masters are near. Your creative energy is peaking; execute your vision now.",
+                "444": "Absolute Protection. You are being guided through an invisible shield. Fear nothing.",
+                "555": "Massive Transformation. A major shift is clearing out what no longer serves you.",
+                "777": "Jackpot Synchronicity. Financial or spiritual luck is dropping into your field.",
+                "888": "Infinite Abundance. Karma is balancing in your favor. Expect a sudden influx."
+            };
+            const code = codes[Math.floor(Math.random() * codes.length)];
+            document.getElementById('angel-code').innerText = code;
+            document.getElementById('angel-meaning-title').innerText = "Frequency: " + code;
+            document.getElementById('angel-task').innerText = meanings[code] + "\n\nSync Task: Look for this exact number on a license plate or timestamp today.";
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
     </script>
 </body>
 </html>
-  
-      
+        
+        
+        
+        
