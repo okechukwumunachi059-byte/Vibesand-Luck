@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Prevents unwanted zooming on mobile devices for a native app feel -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vibe & Luck</title> 
+    
+    <!-- Core Telegram WebApp API -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        /* --- 1. GLOBAL VARIABLES & THEME --- */
+        :root {
+            --bg-top: #0a0b1a;
+            --bg-bottom: #161122;
+            --card-bg: rgba(25, 30, 70, 0.4);
+            --card-border: rgba(100, 150, 255, 0.15);
+            --card-glow: rgba(100, 150, 255, 0.3);
+            --text-main: #ffffff;
+            --text-accent: #F9D976;
+            --text-muted: #8C9BB4;
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            min-height: 100vh;
+            /* Prevents text selection for a native app feel */
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- 2. HEADER TYPOGRAPHY --- */
+        .header-container {
+            margin-bottom: 30px;
+            margin-top: 10px;
+        }
+        
+        .header-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        h1 {
+            font-family: 'Georgia', serif; /* Matches the elegant look in the reference */
+            color: var(--text-accent);
+            font-size: 32px;
+            margin: 5px 0;
+            font-weight: normal;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(249, 217, 118, 0.4);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* --- 3. THE 2-COLUMN GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* --- 4. PREMIUM CARD DESIGN --- */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px; /* High radius for soft corners */
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .card:active {
+            transform: scale(0.96);
+            box-shadow: 0 0 25px var(--card-glow);
+            border-color: rgba(100, 150, 255, 0.4);
+        }
+
+        /* Image/Icon container inside the cards */
+        .card-visual {
+            width: 70px; 
+            height: 70px; 
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100,150,255,0.2) 0%, rgba(0,0,0,0) 70%);
+            margin-bottom: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 38px; 
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+
+        /* Screens hidden by default for the router */
+        .screen { display: none; }
+        .active-screen { display: block; animation: fadeIn 0.3s ease; }
+      @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+  <body>
+    <!-- MAIN MENU SCREEN -->
+    <div id="main-menu" class="screen active-screen">
+        <div class="header-container">
+            <div class="header-icon">✦</div>
+            <h1>Horoscope</h1>
+            <div class="subtitle">MINI APP</div>
+        </div>
+
+        <div class="grid-container">
+            <div class="card" onclick="navigate('daily-draw-screen')">
+                <div class="card-visual">🃏</div>
+                <div class="card-title">Daily Card Draw</div>
+            </div>
+            
+            <div class="card" onclick="navigate('love-match-screen')">
+                <div class="card-visual">❤️</div>
+                <div class="card-title">Love Match</div>
+            </div>
+            
+            <div class="card" onclick="navigate('breakup-support-screen')">
+                <div class="card-visual">💔</div>
+                <div class="card-title">Breakup Support</div>
+            </div>
+            
+            <div class="card" onclick="navigate('mood-forecast-screen')">
+                <div class="card-visual">🧿</div>
+                <div class="card-title">Mood Forecast</div>
+            </div>
+            
+            <div class="card" onclick="navigate('horoscope-screen')">
+                <div class="card-visual">♈</div>
+                <div class="card-title">Horoscope</div>
+            </div>
+            
+            <div class="card" onclick="navigate('lucky-numbers-screen')">
+                <div class="card-visual">🎲</div>
+                <div class="card-title">Lucky Numbers</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLACEHOLDER SCREENS (To prove the router works) -->
+    <div id="daily-draw-screen" class="screen">
+        <h2 style="color: var(--text-accent);">Daily Card Draw Engine</h2>
+        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint A)</p>
+        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+    <div id="love-match-screen" class="screen">
+        <h2 style="color: var(--text-accent);">Love Match Hub</h2>
+        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint B)</p>
+        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+    <div id="breakup-support-screen" class="screen">
+        <h2 style="color: var(--text-accent);">Healing Rituals</h2>
+        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint C)</p>
+        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+    <div id="mood-forecast-screen" class="screen">
+        <h2 style="color: var(--text-accent);">Mood Forecast</h2>
+        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint D)</p>
+        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+    <div id="horoscope-screen" class="screen">
+        <h2 style="color: var(--text-accent);">Horoscope</h2>
+        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint E)</p>
+        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+    <div id="lucky-numbers-screen" class="screen">
+<h2 style="color: var(--text-accent);">Lucky Numbers</h2>
+        <p style="color: var(--text-muted); font-size: 14px;">(Coming in Sprint F)</p>
+        <div style="margin-top: 30px; color: var(--text-main); border: 1px solid var(--text-accent); padding: 10px; border-radius: 10px; cursor: pointer;" onclick="navigate('main-menu')">Back to Menu</div>
+    </div>
+
+    <!-- CORE JAVASCRIPT ROUTER -->
+    <script>
+        const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : {};
+        if (typeof tg.ready === 'function') {
+            tg.ready();
+            tg.expand();
+            try {
+                tg.setHeaderColor('#0a0b1a');
+                tg.setBackgroundColor('#161122');
+            } catch (e) {}
+        }
+
+        // Master Navigation Router
+        function navigate(targetScreenId) {
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                screen.classList.remove('active-screen');
+            });
+            
+            // Show target screen
+            const targetScreen = document.getElementById(targetScreenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active-screen');
+            }
+            
+            // Native button tap vibration
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+        }
+    </script>
+</body>
+</html>
+  
+      
